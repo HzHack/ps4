@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlayStation®4 Host | بوابة التعديل - أبو عساف</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          screens: {
+            'xs': '420px'
+          },
+          colors: {
+            ps: {
+              blue: '#0070d1',
+              neon: '#00d2ff',
+              dark: '#05070d',
+              card: '#0c1222',
+              border: '#1b2a47',
+              triangle: '#00f0a8',
+              circle: '#ff4d6d',
+              cross: '#38bdf8',
+              square: '#f472b6'
+            }
+          },
+          fontFamily: {
+            tajawal: ['Tajawal', 'sans-serif'],
+            sony: ['Orbitron', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: #05070d;
+      color: #f1f5f9;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    .sony-font {
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 0.3em;
+    }
+
+    .ps-glass-card {
+      background: linear-gradient(175deg, rgba(14, 22, 38, 0.95) 0%, rgba(8, 12, 22, 0.98) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 112, 209, 0.18);
+    }
+
+    .ps-launch-button {
+      background: linear-gradient(135deg, #005bb5 0%, #0070d1 50%, #00b4d8 100%);
+      box-shadow: 0 8px 30px rgba(0, 112, 209, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .ps-launch-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0, 210, 255, 0.75);
+    }
+
+    .ps-launch-button:active {
+      transform: translateY(1px);
+    }
+
+    .ambient-glow {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(0, 112, 209, 0.18) 0%, rgba(0, 210, 255, 0.04) 50%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(50px);
+      transform: translate(-50%, -50%);
+      left: 50%;
+      top: 35%;
+    }
+  </style>
+</head>
+<body class="flex flex-col justify-between relative selection:bg-cyan-500 selection:text-white">
+
+  <!-- Interactive Background Canvas for Symbols (△ ○ ✕ □) -->
+  <canvas id="psCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+  <div class="ambient-glow z-0"></div>
+
+  <!-- Top Bar (Sony Official Minimalist) -->
+  <div class="relative z-20 w-full bg-black/95 border-b border-white/10 px-4 sm:px-8 py-2 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="text-[11px] font-bold text-slate-400">خادم الهوست جاهز ومتصل</span>
+    </div>
+    <div class="sony-font font-black text-xs text-white tracking-widest uppercase">
+      SONY
+    </div>
+  </div>
+
+  <!-- Main Navigation Header (Clean & Fully Responsive on Mobile) -->
+  <header class="relative z-20 w-full bg-[#090e1a]/95 backdrop-blur-md border-b border-slate-800/90 px-4 sm:px-8 py-3">
+    <div class="max-w-xl mx-auto flex items-center justify-between gap-2">
+      
+      <!-- Brand & Info -->
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 p-0.5 shadow-md shadow-cyan-500/20">
+          <div class="w-full h-full bg-[#070b14] rounded-[10px] flex items-center justify-center text-cyan-400 font-bold">
+            <i class="fa-brands fa-playstation text-xl"></i>
+          </div>
+        </div>
+        
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-base sm:text-lg font-black text-white whitespace-nowrap">PlayStation<span class="text-cyan-400">®4</span></span>
+            <span class="text-[10px] font-bold px-1.5 py-0.5 bg-blue-500/20 text-cyan-300 border border-blue-500/30 rounded uppercase whitespace-nowrap">Host</span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-medium truncate">بوابة التعديل المعتمدة</p>
+        </div>
+      </div>
+
+      <!-- Controls & Icons -->
+      <div class="flex items-center gap-2 shrink-0">
+        <!-- Controller Symbols (Hidden on tiny screens to prevent clutter) -->
+        <div class="hidden xs:flex items-center gap-2 bg-black/40 px-2.5 py-1.5 rounded-full border border-white/10 text-xs">
+          <span class="text-[#00f0a8]">▲</span>
+          <span class="text-[#ff4d6d]">●</span>
+          <span class="text-[#38bdf8]">✕</span>
+          <span class="text-[#f472b6]">■</span>
+        </div>
+
+        <!-- Mute / Unmute Button -->
+        <button id="soundToggleBtn" onclick="toggleAudio()" class="w-9 h-9 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-cyan-400 flex items-center justify-center transition" aria-label="تفعيل أو كتم الصوت">
+          <i id="soundIcon" class="fa-solid fa-volume-high text-xs"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Card -->
+  <main class="relative z-10 w-full max-w-lg mx-auto px-4 py-6 sm:py-8 flex-1 flex flex-col justify-center">
+    
+    <div class="ps-glass-card rounded-[26px] p-5 sm:p-8 text-center relative overflow-hidden">
+      
+      <!-- Top Neon Line -->
+      <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+
+      <!-- Firmware Support Badge -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-950/70 border border-cyan-400/40 shadow-md shadow-cyan-500/10 mb-4">
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+        <span class="text-xs sm:text-sm font-extrabold text-cyan-300">
+          يدعم من إصدار 7.00 إلى إصدار 13.00
+        </span>
+      </div>
+
+      <!-- Title Headline -->
+      <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
+        بوابة استضافة <span class="text-transparent bg-clip-text bg-gradient-to-l from-cyan-400 to-blue-400">تعديل سوني 4</span>
+      </h1>
+      
+      <p class="text-slate-300 text-xs sm:text-sm max-w-sm mx-auto leading-relaxed mb-6">
+        اضغط على الزر بالأسفل لفتح صفحة الهوست والتعديل مباشرة عبر المتصفح.
+      </p>
+
+      <!-- System Warning Box: Turn Off Automatic Downloads -->
+      <div class="bg-[#070b16]/90 rounded-2xl p-4 sm:p-5 mb-6 text-right border-r-4 border-amber-500 border border-slate-800">
+        
+        <div class="flex items-center justify-between pb-2.5 border-b border-slate-800/80 mb-3">
+          <div class="flex items-center gap-2 text-amber-400 font-extrabold text-sm sm:text-base">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>خطوة إلزامية: إيقاف التحديثات التلقائية</span>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">تنبيه هام</span>
+        </div>
+
+        <p class="text-xs text-slate-300 leading-relaxed mb-3">
+          قبل فتح الهوست، تأكد من تعطيل التحديث التلقائي لمنع إغلاق الثغرة على جهازك:
+        </p>
+
+        <div class="space-y-2 bg-black/40 p-3 rounded-xl border border-slate-800/70 text-xs text-slate-200">
+          <div class="flex items-center gap-2">
+            <span class="w-5 h-5 shrink-0 rounded-full bg-blue-500/20 text-cyan-400 flex items-center justify-center font-bold text-[11px]">1</span>
+            <span>توجه إلى: <b>الإعدادات (Settings)</b> ← <b>النظام (System)</b></span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-5 h-5 shrink-0 rounded-full bg-blue-500/20 text-cyan-400 flex items-center justify-center font-bold text-[11px]">2</span>
+            <span>اختر: <b>التنزيلات التلقائية (Automatic Downloads)</b></span>
+          </div>
+          <div class="flex items-center gap-2 text-amber-300 font-semibold pt-0.5">
+            <span class="w-5 h-5 shrink-0 rounded-full bg-amber-500/25 text-amber-400 flex items-center justify-center font-bold text-[11px]">3</span>
+            <span>قم <b>بإلغاء التحديد</b> عن: <b>ملفات تحديث برمجيات النظام</b></span>
+          </div>
+        </div>
+
+        <!-- Risk Warning -->
+        <p class="text-[10px] text-slate-500 mt-3 leading-relaxed">
+          <i class="fa-solid fa-shield-halved text-slate-600 ml-1"></i>
+          استخدم الأداة على مسؤوليتك الشخصية — قد يؤدي التعديل إلى فقدان الضمان أو حظر الحساب من خدمات PSN.
+        </p>
+      </div>
+
+      <!-- Main Direct Launch Button -->
+      <a 
+        id="launchBtn"
+        href="https://rawgame4.github.io/" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        class="ps-launch-button group w-full py-4 px-6 rounded-full text-white flex items-center justify-center gap-3 font-black text-lg sm:text-xl no-underline tracking-wide select-none cursor-pointer mb-4"
+      >
+        <i class="fa-solid fa-bolt text-cyan-200"></i>
+        <span>الدخول إلى صفحة التعديل</span>
+        <i class="fa-solid fa-arrow-left text-sm mr-1 group-hover:-translate-x-1 transition-transform"></i>
+      </a>
+
+      <!-- QR Code Button (Placed Here at the Bottom of Card) -->
+      <div class="pt-2 flex justify-center">
+        <button 
+          onclick="toggleQrModal()" 
+          class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40 text-cyan-300 text-xs sm:text-sm font-bold flex items-center justify-center gap-2.5 transition shadow-sm"
+        >
+          <i class="fa-solid fa-qrcode text-base"></i>
+          <span>فتح باركود الهوست (QR Code) للمسح السريع</span>
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- QR Code Modal (Working High-Resolution QR) -->
+  <div id="qrModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-[#0c1222] border border-cyan-500/40 rounded-3xl p-6 max-w-xs w-full text-center relative shadow-2xl shadow-cyan-500/20">
+      
+      <button onclick="toggleQrModal()" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition" aria-label="إغلاق">
+        ✕
+      </button>
+
+      <div class="w-11 h-11 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mx-auto mb-2.5">
+        <i class="fa-solid fa-qrcode text-xl"></i>
+      </div>
+
+      <h2 class="text-base font-black text-white mb-1">باركود صفحة التعديل</h2>
+      <p class="text-[11px] text-slate-400 mb-4">امسح الكود بكاميرا هاتفك أو جهاز PS4 للفتح المباشر</p>
+
+      <!-- QR Image Generated for https://rawgame4.github.io/ -->
+      <div class="bg-white p-3 rounded-2xl inline-block shadow-md mx-auto mb-4 border-2 border-cyan-400">
+        <img 
+          src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://rawgame4.github.io/&margin=4" 
+          alt="QR Code Host Link" 
+          class="w-40 h-40 block mx-auto rounded-lg"
+          loading="lazy"
+        />
+      </div>
+
+      <button onclick="toggleQrModal()" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition">
+        إغلاق
+      </button>
+    </div>
+  </div>
+
+  <!-- Custom Footer with Abu Assaf Credits -->
+  <footer class="relative z-10 w-full py-4 text-center border-t border-slate-900 bg-black/95">
+    <div class="max-w-md mx-auto px-4 flex flex-col items-center gap-1.5">
+      <!-- PlayStation Shape Icons in Footer -->
+      <div class="flex items-center gap-3 text-xs opacity-75 mb-0.5">
+        <span class="text-[#00f0a8]">▲</span>
+        <span class="text-[#ff4d6d]">●</span>
+        <span class="text-[#38bdf8]">✕</span>
+        <span class="text-[#f472b6]">■</span>
+      </div>
+      
+      <!-- Owner Credits -->
+      <div class="text-slate-300 text-sm font-extrabold flex items-center gap-1.5">
+        <span>تصميم وتطوير:</span>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 font-black text-base tracking-wide">
+          أبو عساف
+        </span>
+      </div>
+
+      <p class="text-[11px] text-slate-500">
+        جميع الحقوق محفوظة © <span id="year">2026</span> | مخصصة لمتابعي أبو عساف
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    const HOST_URL = "https://rawgame4.github.io/";
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    // ============ Audio ============
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playPsSound(type) {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const now = audioCtx.currentTime;
+        if (type === 'click') {
+          [523.25, 783.99].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + (i * 0.04));
+            gain.gain.setValueAtTime(0.08, now + (i * 0.04));
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + (i * 0.04));
+            osc.stop(now + 0.25);
+          });
+        }
+      } catch (e) {
+        console.warn('Audio playback failed:', e);
+      }
+    }
+
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      const icon = document.getElementById("soundIcon");
+      if (soundEnabled) {
+        icon.className = "fa-solid fa-volume-high text-xs text-cyan-400";
+        playPsSound('click');
+      } else {
+        icon.className = "fa-solid fa-volume-xmark text-xs text-slate-500";
+      }
+    }
+
+    // ============ QR Modal ============
+    function toggleQrModal() {
+      const modal = document.getElementById('qrModal');
+      if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        playPsSound('click');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    // Close modal on ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('qrModal');
+        if (modal && !modal.classList.contains('hidden')) {
+          modal.classList.add('hidden');
+        }
+      }
+    });
+
+    // ============ Launch Button ============
+    // Since <a> has href + target="_blank", browser handles opening automatically.
+    // We only play the sound here — NO window.open to prevent double tabs.
+    const launchBtn = document.getElementById("launchBtn");
+    if (launchBtn) {
+      launchBtn.addEventListener("click", function() {
+        playPsSound('click');
+      });
+    }
+
+    // ============ Background Canvas Particles ============
+    const canvas = document.getElementById("psCanvas");
+    const ctx = canvas.getContext("2d");
+    let symbols = [];
+    const symbolTypes = [
+      { char: "▲", color: "rgba(0, 240, 168, " },
+      { char: "●", color: "rgba(255, 77, 109, " },
+      { char: "✕", color: "rgba(56, 189, 248, " },
+      { char: "■", color: "rgba(244, 114, 182, " }
+    ];
+
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0); // reset before scaling
+      ctx.scale(dpr, dpr);
+
+      // Rebuild symbols to fit new dimensions
+      symbols = [];
+      const count = Math.min(Math.floor(w / 40), 25);
+      for (let i = 0; i < count; i++) {
+        const sym = symbolTypes[Math.floor(Math.random() * symbolTypes.length)];
+        symbols.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          char: sym.char,
+          color: sym.color,
+          size: Math.random() * 14 + 12,
+          speedX: (Math.random() - 0.5) * 0.35,
+          speedY: (Math.random() - 0.5) * 0.35,
+          alpha: Math.random() * 0.18 + 0.08,
+          rot: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 0.01
+        });
+      }
+    }
+
+    function animateCanvas() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      ctx.clearRect(0, 0, w, h);
+
+      symbols.forEach(s => {
+        s.x += s.speedX;
+        s.y += s.speedY;
+        s.rot += s.rotSpeed;
+
+        if (s.x < -20) s.x = w + 20;
+        if (s.x > w + 20) s.x = -20;
+        if (s.y < -20) s.y = h + 20;
+        if (s.y > h + 20) s.y = -20;
+
+        ctx.save();
+        ctx.translate(s.x, s.y);
+        ctx.rotate(s.rot);
+        ctx.font = `${s.size}px Arial, sans-serif`;
+        ctx.fillStyle = s.color + s.alpha + ")";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(s.char, 0, 0);
+        ctx.restore();
+      });
+      requestAnimationFrame(animateCanvas);
+    }
+
+    // ============ Init ============
+    window.addEventListener("resize", resizeCanvas);
+
+    window.addEventListener("load", () => {
+      // Set current year
+      const yearEl = document.getElementById('year');
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+      resizeCanvas();
+      animateCanvas();
+    });
+  </script>
+
+</body>
+</html>
